@@ -12,22 +12,28 @@ spec:
         - image: gcr.io/cloud-builders/kubectl
           imagePullPolicy: Always
           name: argo-rollouts-switching
-          command: ["/bin/sh", "-c"]
-          args:
-            - /argo-rollouts-switching.sh $(NAMESPACE) $(SPINNAKER_APPLICATION_NAME)
+          command:
+            - bash
+            - /mnt/argo-rollouts-switching.sh
+            - $(NAMESPACE)
+            - $(SPINNAKER_APPLICATION_NAME)
           env:
             - name: SPINNAKER_APPLICATION_NAME
               valueFrom:
                 fieldRef:
-                  fieldPath: metadata.labels.app.kubernetes.io/name
+                  fieldPath: metadata.labels['app.kubernetes.io/name']
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
           volumeMounts:
-            - name: config
-              mountPath: /
+            - name: script
+              mountPath: /mnt/argo-rollouts-switching.sh
               subPath: argo-rollouts-switching.sh
       restartPolicy: Never
       serviceAccountName: argo-rollouts-switching
       volumes:
-        - name: config
+        - name: script
           configMap:
             name: argo-rollouts-switching
 ---
