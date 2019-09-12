@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: argo-rollouts-switching
+spec:
+  backoffLimit: 1
+  completions: 1
+  parallelism: 1
+  template:
+    spec:
+      containers:
+        - image: gcr.io/cloud-builders/kubectl
+          imagePullPolicy: Always
+          name: argo-rollouts-switching
+          command: ["/bin/sh", "-c"]
+          args:
+            - /argo-rollouts-switching.sh $(NAMESPACE) $(SPINNAKER_APPLICATION_NAME)
+          env:
+            - name: SPINNAKER_APPLICATION_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels.app.kubernetes.io/name
+          volumeMounts:
+            - name: config
+              mountPath: /
+              subPath: argo-rollouts-switching.sh
+      restartPolicy: Never
+      serviceAccountName: argo-rollouts-switching
+      volumes:
+        - name: config
+          configMap:
+            name: argo-rollouts-switching
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argo-rollouts-switching
+data:
+  argo-rollouts-switching.sh: |+
+    #!/bin/bash
+    set -eux
+
+    NAMESPACE=$1
+    SPINNAKER_APPLICATION_NAME=$2
+
+    kubectl -n $NAMESPACE get rollouts.argoproj.io --selector 'app.kubernetes.io/name=sample-argo-rollouts' -o name | xargs -I{} kubectl -n $NAMESPACE patch {} --patch '{"spec": {"paused": false}}' --type merge
