@@ -21,7 +21,7 @@ spec:
             - name: JOB_NAME
               valueFrom:
                 fieldRef:
-                  fieldPath: metadata.labels.job-name
+                  fieldPath: metadata.labels['job-name']
                   #metadata.labels['app.kubernetes.io/name']
             - name: NAMESPACE
               valueFrom:
@@ -47,10 +47,8 @@ data:
     #!/bin/bash
     set -eux
 
-    pip install jq
-
     NAMESPACE=$1
     JOB_NAME=$2
-    SPINNAKER_APPLICATION_NAME=$(kubectl -n $NAMESPACE get job $JOB_NAME -o json | jq -rc '.metadata.labels | .["app.kubernetes.io/name"]')
+    SPINNAKER_APPLICATION_NAME=$(kubectl -n $NAMESPACE get rollouts.argoproj.io sampleapp -o jsonpath="{ .metadata.labels['app\.kubernetes\.io\/name'] }")
 
     kubectl -n $NAMESPACE get rollouts.argoproj.io --selector "app.kubernetes.io/name=$SPINNAKER_APPLICATION_NAME" -o name | xargs -I{} kubectl -n $NAMESPACE patch {} --patch '{"spec": {"paused": false}}' --type merge
