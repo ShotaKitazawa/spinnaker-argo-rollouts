@@ -16,12 +16,13 @@ spec:
             - bash
             - /mnt/argo-rollouts-switching.sh
             - $(NAMESPACE)
-            - $(SPINNAKER_APPLICATION_NAME)
+            - $(JOB_NAME)
           env:
-            - name: SPINNAKER_APPLICATION_NAME
+            - name: JOB_NAME
               valueFrom:
                 fieldRef:
-                  fieldPath: metadata.labels['app.kubernetes.io/name']
+                  fieldPath: metadata.labels.job-name
+                  #metadata.labels['app.kubernetes.io/name']
             - name: NAMESPACE
               valueFrom:
                 fieldRef:
@@ -46,8 +47,10 @@ data:
     #!/bin/bash
     set -eux
 
-    NAMESPACE=$1
-    echo $2
-    SPINNAKER_APPLICATION_NAME=sample-argo-rollouts
+    pip install jq
 
-    kubectl -n $NAMESPACE get rollouts.argoproj.io --selector 'app.kubernetes.io/name=$SPINNAKER_APPLICATION_NAME' -o name | xargs -I{} kubectl -n $NAMESPACE patch {} --patch '{"spec": {"paused": false}}' --type merge
+    NAMESPACE=$1
+    JOB_NAME=$2
+    SPINNAKER_APPLICATION_NAME=$(kubectl -n $NAMESPACE get job $JOB_NAME -o json | jq -rc '.metadata.labels | .["app.kubernetes.io/name"]')
+
+    kubectl -n $NAMESPACE get rollouts.argoproj.io --selector "app.kubernetes.io/name=$SPINNAKER_APPLICATION_NAME" -o name | xargs -I{} kubectl -n $NAMESPACE patch {} --patch '{"spec": {"paused": false}}' --type merge
