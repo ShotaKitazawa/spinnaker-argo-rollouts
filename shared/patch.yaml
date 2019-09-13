@@ -47,6 +47,7 @@ data:
     set -eux
 
     NAMESPACE=$1
-    SPINNAKER_APPLICATION_NAME=$2
+    echo $2
+    SPINNAKER_APPLICATION_NAME=sample-argo-rollouts
 
-    kubectl -n $NAMESPACE get rollouts.argoproj.io --selector 'app.kubernetes.io/name=sample-argo-rollouts' -o name | xargs -I{} kubectl -n $NAMESPACE patch {} --patch '{"spec": {"paused": false}}' --type merge
+    kubectl -n $NAMESPACE get rollouts.argoproj.io --selector 'app.kubernetes.io/name=$SPINNAKER_APPLICATION_NAME' -o name | xargs -I{} kubectl -n $NAMESPACE patch {} --patch '{"spec": {"paused": false}}' --type merge

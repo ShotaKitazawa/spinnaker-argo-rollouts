@@ -19,7 +19,7 @@ spec:
   - protocol: TCP
     port: 8080  # Serviceの待ち受けるPort
     targetPort: 8080  # Serviceの振り分け先PodのPort
-  selector: {}  #app: prod  # PDB 用のラベル、pod振り分け用selectorの付与は Argo-Rollout が行う
+  selector: {}  # pod振り分け用selectorの付与は Argo-Rollout が行う
   type: NodePort
 ---
 # テスト用 Service の定義
@@ -36,7 +36,7 @@ spec:
   - protocol: TCP
     port: 8080  # Serviceの待ち受けるPort
     targetPort: 8080  # Serviceの振り分け先PodのPort
-  selector: {}  # app: dummy  # ダミー用ラベル、pod振り分け用selectorの付与は Argo-Rollout が行う
+  selector: {}  # pod振り分け用selectorの付与は Argo-Rollout が行う
   type: NodePort
 ---
 # Pod のオートスケーリング用の設定
