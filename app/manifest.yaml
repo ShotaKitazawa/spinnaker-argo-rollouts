@@ -47,7 +47,7 @@ metadata:
   namespace: test
 spec:
   scaleTargetRef:
-    apiVersion: argoproj.io
+    apiVersion: argoproj.io/v1alpha1
     kind: Rollout
     name: sampleapp
   # 負荷テストを行い以下の値を決定する
