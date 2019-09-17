@@ -5,13 +5,28 @@ metadata:
   name: argo-rollouts-switching
 ---
 apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: argo-rollouts-switching
+rules:
+- apiGroups: ["argoproj.io"]
+  resources:
+  - rollouts
+  #verbs: ["create", "delete", "deletecollection", "get", "list", "patch", "update",  "watch"]
+  verbs: ["get", "list", "watch", "patch", "update"]
+- apiGroups: ["batch"]
+  resources:
+  - jobs
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: argo-rollouts-switching
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: cluster-admin
+  name: argo-rollouts-switching
 subjects:
 - namespace: test
   kind: ServiceAccount
@@ -68,6 +83,6 @@ data:
 
     NAMESPACE=$1
     JOB_NAME=$2
-    SPINNAKER_APPLICATION_NAME=$(kubectl -n $NAMESPACE get rollouts.argoproj.io sampleapp -o jsonpath="{ .metadata.labels['app\.kubernetes\.io\/name'] }")
+    SPINNAKER_APPLICATION_NAME=$(kubectl -n $NAMESPACE get job $JOB_NAME -o jsonpath="{ .metadata.labels['app\.kubernetes\.io\/name'] }")
 
     kubectl -n $NAMESPACE get rollouts.argoproj.io --selector "app.kubernetes.io/name=$SPINNAKER_APPLICATION_NAME" -o name | xargs -I{} kubectl -n $NAMESPACE patch {} --patch '{"spec": {"paused": false}}' --type merge
