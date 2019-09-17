@@ -12,8 +12,8 @@ rules:
 - apiGroups: ["argoproj.io"]
   resources:
   - rollouts
-  #verbs: ["create", "delete", "deletecollection", "get", "list", "patch", "update",  "watch"]
-  verbs: ["get", "list", "watch", "patch", "update"]
+  #verbs: ["get", "list", "watch", "patch", "update"]
+  verbs: ["get", "patch"]
 - apiGroups: ["batch"]
   resources:
   - jobs
