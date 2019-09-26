@@ -51,7 +51,7 @@ spec:
     kind: Rollout
     name: sampleapp
   # 負荷テストを行い以下の値を決定する
-  maxReplicas: 1
+  maxReplicas: 10
   minReplicas: 1
   targetCPUUtilizationPercentage: 60
 ---
