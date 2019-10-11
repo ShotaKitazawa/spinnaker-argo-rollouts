@@ -12,7 +12,7 @@ metadata:
   name: sampleapp
   namespace: test
   annotations:
-    #cloud.google.com/neg: '{"ingress": true}'
+    cloud.google.com/neg: '{"ingress": true}'
     #beta.cloud.google.com/backend-config: '{"ports": {"8080":"sampleapp"}}'
 spec:
   ports:
@@ -29,7 +29,7 @@ metadata:
   name: sampleapp-test
   namespace: test
   annotations:
-    #cloud.google.com/neg: '{"ingress": true}'
+    cloud.google.com/neg: '{"ingress": true}'
     #beta.cloud.google.com/backend-config: '{"ports": {"8080":"sampleapp"}}'
 spec:
   ports:
@@ -65,8 +65,7 @@ spec:
   minAvailable: "50%"
   selector:
     matchLabels:
-      eventId: dummy
-      #eventId: ${ trigger.eventId }
+      feature: pdb
 ---
 # Ingress の定義 (本番用とテスト用とで2つのドメインが必要)
 apiVersion: extensions/v1beta1
@@ -98,22 +97,17 @@ kind: Rollout
 metadata:
   name: sampleapp
   namespace: test
-  labels:
-    #eventId: ${ trigger.eventId }  # Spinnakerが自動付与
-    eventId: dummy
 spec:
   replicas: 3  # Pod数
   selector:
     matchLabels:
-      #eventId: ${ trigger.eventId }  # Spinnakerが自動付与
-      eventId: dummy
+      feature: pdb
   template:
     metadata:
       annotations:
         update-time: ${ new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new java.util.Date()) }
       labels:
-        #eventId: ${ trigger.eventId }  # Spinnakerが自動付与 (このまま)
-        eventId: dummy
+        feature: pdb
     spec:
       containers:
       - image: kanatakita/print-tag:v1
