@@ -1,9 +1,23 @@
 ---
+# argo-rollouts-switching Job 用の ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: argo-rollouts-switching
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: argo-rollouts-switching
+subjects:
+- namespace: test  # App が配置される namespace を指定
+  kind: ServiceAccount
+  name: argo-rollouts-switching
+---
 # Namespace の定義
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: test # 命名規則に従いKubernetsのネームスペースを作成
+  name: test
 ---
 # 本番用 Service の定義
 apiVersion: v1
@@ -52,7 +66,7 @@ spec:
     name: sampleapp
   # 負荷テストを行い以下の値を決定する
   maxReplicas: 10
-  minReplicas: 1
+  minReplicas: 3
   targetCPUUtilizationPercentage: 60
 ---
 # Pod の evict 時の制御の設定
