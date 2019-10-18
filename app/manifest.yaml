@@ -152,6 +152,7 @@ spec:
             cpu: 100m
             memory: 256Mi
   revisionHistoryLimit: 3
+  minReadySeconds: 30
   strategy:
     blueGreen:
       activeService: sampleapp
