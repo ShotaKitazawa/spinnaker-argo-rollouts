@@ -3,11 +3,13 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: argo-rollouts-switching
+  # namespace: {}  # Spinnaker が自動付与
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+kind: Role
 metadata:
   name: argo-rollouts-switching
+  # namespace: {}  # Spinnaker が自動付与
 rules:
 - apiGroups: ["argoproj.io"]
   resources:
@@ -18,19 +20,19 @@ rules:
   - jobs
   verbs: ["get"]
 ---
-# .subjects.namespace が Spinnaker から変更不可なため、各 App 用マニフェストで定義する必要がある
-#apiVersion: rbac.authorization.k8s.io/v1
-#kind: ClusterRoleBinding
-#metadata:
-#  name: argo-rollouts-switching
-#roleRef:
-#  apiGroup: rbac.authorization.k8s.io
-#  kind: ClusterRole
-#  name: argo-rollouts-switching
-#subjects:
-#- namespace: test
-#  kind: ServiceAccount
-#  name: argo-rollouts-switching
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: argo-rollouts-switching
+  #namespace: {}  # Spinnaker が自動付与
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: argo-rollouts-switching
+subjects:
+- kind: ServiceAccount
+  name: argo-rollouts-switching
+  #namespace: {}
 ---
 apiVersion: batch/v1
 kind: Job
