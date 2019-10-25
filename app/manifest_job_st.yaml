@@ -44,7 +44,7 @@ data:
     set -xue
     PROTO=http
     TARGET=$(kubectl get ingress -n $Namespace $Ingress -o go-template='{{ $ingress := index .status.loadBalancer.ingress 0 }}{{ $ingress.ip }}')
-    if ! curl -k --header "HOST:$TestFQDN" $PROTO://$TARGET; then exit 1; fi
+    if ! curl -f -k --header "HOST:$TestFQDN" $PROTO://$TARGET; then exit 1; fi
 
 ---
 apiVersion: v1
