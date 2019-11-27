@@ -87,4 +87,4 @@ data:
     SPINNAKER_APPLICATION_NAME=$(kubectl -n $NAMESPACE get job $JOB_NAME -o jsonpath="{ .metadata.labels['app\.kubernetes\.io\/name'] }")
     if [ "$SPINNAKER_APPLICATION_NAME" = "" ]; then exit 1; fi
 
-    kubectl -n $NAMESPACE get rollouts.argoproj.io --selector "app.kubernetes.io/name=$SPINNAKER_APPLICATION_NAME" -o name | xargs -I{} kubectl -n $NAMESPACE patch {} --patch '{"spec": {"paused": false}}' --type merge
+    kubectl -n $NAMESPACE get rollouts.argoproj.io --selector "app.kubernetes.io/name=$SPINNAKER_APPLICATION_NAME" -o name | xargs -I{} kubectl -n $NAMESPACE patch {} --patch '{"status": {"pauseConditions": []}}' --type merge
